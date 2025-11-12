@@ -350,13 +350,25 @@
                 return;
             }
 
+            // Check if a key is selected in listBoxKeys
+            if (listBoxKeys.SelectedIndex < 0 || listBoxKeys.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a key from the Keys list first.",
+            "No Key Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
-                // Parse key number
-                byte keyNumber = (byte)numKeyNumber.Value;
+                KeyItem selectedKey = listBoxKeys.SelectedItem as KeyItem;
+                if (selectedKey == null)
+                    return;
 
-                // Parse key from hex string
-                byte[] key = ParseHexKey(txtKey.Text);
+                // Use key number from selected key
+                byte keyNumber = selectedKey.KeyNumber;
+
+                // Use key value from txtKeySelection
+                byte[] key = ParseHexKey(txtKeySelection.Text);
                 if (key == null || key.Length != 16)
                 {
                     MessageBox.Show("Invalid key format. Please enter 16 hex bytes (e.g., 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00)",
@@ -384,7 +396,7 @@
                     btnAuthenticate.Text = "Authenticate";
                     toolStripStatusLabel.Text = "Authentication failed";
                     MessageBox.Show("Authentication failed. Please check the key number and key value.\n\nMake sure:\n- The key number exists in the application\n- The key value is correct\n- The card is still present",
-         "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+ "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
@@ -393,7 +405,7 @@
                 btnAuthenticate.BackColor = SystemColors.Control;
                 btnAuthenticate.Text = "Authenticate";
                 MessageBox.Show($"Error during authentication:\n{ex.Message}",
-         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+ "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -608,14 +620,12 @@
                 if (selectedKey == null)
                     return;
 
-                // Fill authentication fields with selected key
-                numKeyNumber.Value = selectedKey.KeyNumber;
                 
                 // Show existing key value in txtKeySelection
                 if (!string.IsNullOrEmpty(selectedKey.KeyValue))
                 {
                     txtKeySelection.Text = selectedKey.KeyValue;
-                    txtKey.Text = selectedKey.KeyValue;
+
                 }
                 else
                 {
@@ -644,9 +654,7 @@
 
                 // Update the key value in the KeyItem
                 selectedKey.KeyValue = txtKeySelection.Text;
-    
-                // Also update the authentication textbox
-                txtKey.Text = txtKeySelection.Text;
+
 
                 // Refresh the listbox display to show updated key
                 int currentIndex = listBoxKeys.SelectedIndex;

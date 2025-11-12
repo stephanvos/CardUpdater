@@ -47,17 +47,12 @@
             lblFileData = new Label();
             groupBoxAuth = new GroupBox();
             btnAuthenticate = new Button();
-            txtKey = new TextBox();
-            lblKey = new Label();
-            numKeyNumber = new NumericUpDown();
-            lblKeyNumber = new Label();
             statusStrip = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
             groupBoxReader.SuspendLayout();
             groupBoxSelection.SuspendLayout();
             groupBoxOperations.SuspendLayout();
             groupBoxAuth.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)numKeyNumber).BeginInit();
             statusStrip.SuspendLayout();
             SuspendLayout();
             // 
@@ -130,6 +125,19 @@
             groupBoxSelection.TabIndex = 1;
             groupBoxSelection.TabStop = false;
             groupBoxSelection.Text = "Selection - Applications, Files & Keys";
+            // 
+            // txtKeySelection
+            // 
+            txtKeySelection.CharacterCasing = CharacterCasing.Upper;
+            txtKeySelection.Font = new Font("Consolas", 9F);
+            txtKeySelection.Location = new Point(305, 154);
+            txtKeySelection.MaxLength = 47;
+            txtKeySelection.Name = "txtKeySelection";
+            txtKeySelection.PlaceholderText = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+            txtKeySelection.Size = new Size(420, 22);
+            txtKeySelection.TabIndex = 7;
+            txtKeySelection.Text = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+            txtKeySelection.TextChanged += txtKeySelection_TextChanged;
             // 
             // listBoxKeys
             // 
@@ -236,10 +244,6 @@
             // groupBoxAuth
             // 
             groupBoxAuth.Controls.Add(btnAuthenticate);
-            groupBoxAuth.Controls.Add(txtKey);
-            groupBoxAuth.Controls.Add(lblKey);
-            groupBoxAuth.Controls.Add(numKeyNumber);
-            groupBoxAuth.Controls.Add(lblKeyNumber);
             groupBoxAuth.Location = new Point(15, 50);
             groupBoxAuth.Name = "groupBoxAuth";
             groupBoxAuth.Size = new Size(930, 70);
@@ -257,44 +261,6 @@
             btnAuthenticate.UseVisualStyleBackColor = true;
             btnAuthenticate.Click += btnAuthenticate_Click;
             // 
-            // txtKey
-            // 
-            txtKey.CharacterCasing = CharacterCasing.Upper;
-            txtKey.Font = new Font("Consolas", 9F);
-            txtKey.Location = new Point(290, 28);
-            txtKey.MaxLength = 47;
-            txtKey.Name = "txtKey";
-            txtKey.PlaceholderText = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
-            txtKey.Size = new Size(520, 22);
-            txtKey.TabIndex = 3;
-            txtKey.Text = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
-            // 
-            // lblKey
-            // 
-            lblKey.AutoSize = true;
-            lblKey.Location = new Point(200, 31);
-            lblKey.Name = "lblKey";
-            lblKey.Size = new Size(83, 15);
-            lblKey.TabIndex = 2;
-            lblKey.Text = "Key (16 bytes):";
-            // 
-            // numKeyNumber
-            // 
-            numKeyNumber.Location = new Point(95, 28);
-            numKeyNumber.Maximum = new decimal(new int[] { 13, 0, 0, 0 });
-            numKeyNumber.Name = "numKeyNumber";
-            numKeyNumber.Size = new Size(80, 23);
-            numKeyNumber.TabIndex = 1;
-            // 
-            // lblKeyNumber
-            // 
-            lblKeyNumber.AutoSize = true;
-            lblKeyNumber.Location = new Point(15, 31);
-            lblKeyNumber.Name = "lblKeyNumber";
-            lblKeyNumber.Size = new Size(76, 15);
-            lblKeyNumber.TabIndex = 0;
-            lblKeyNumber.Text = "Key Number:";
-            // 
             // statusStrip
             // 
             statusStrip.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel });
@@ -309,19 +275,6 @@
             toolStripStatusLabel.Name = "toolStripStatusLabel";
             toolStripStatusLabel.Size = new Size(39, 17);
             toolStripStatusLabel.Text = "Ready";
-            // 
-            // txtKeySelection
-            // 
-            txtKeySelection.CharacterCasing = CharacterCasing.Upper;
-            txtKeySelection.Font = new Font("Consolas", 9F);
-            txtKeySelection.Location = new Point(305, 154);
-            txtKeySelection.MaxLength = 47;
-            txtKeySelection.Name = "txtKeySelection";
-            txtKeySelection.PlaceholderText = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
-            txtKeySelection.Size = new Size(420, 22);
-            txtKeySelection.TabIndex = 7;
-            txtKeySelection.Text = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
-            txtKeySelection.TextChanged += txtKeySelection_TextChanged;
             // 
             // FormMain
             // 
@@ -343,8 +296,6 @@
             groupBoxOperations.ResumeLayout(false);
             groupBoxOperations.PerformLayout();
             groupBoxAuth.ResumeLayout(false);
-            groupBoxAuth.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)numKeyNumber).EndInit();
             statusStrip.ResumeLayout(false);
             statusStrip.PerformLayout();
             ResumeLayout(false);
@@ -371,10 +322,6 @@
         private Label lblFileData;
       private GroupBox groupBoxAuth;
   private Button btnAuthenticate;
-      private TextBox txtKey;
-        private Label lblKey;
-        private NumericUpDown numKeyNumber;
-        private Label lblKeyNumber;
         private StatusStrip statusStrip;
         private ToolStripStatusLabel toolStripStatusLabel;
         private TextBox txtKeySelection;
