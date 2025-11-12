@@ -316,11 +316,12 @@
                         listBoxFiles.Items[i] = new FileItem(fileIds[i], $"FILE {i + 1}: 0x{fileIds[i]:X2}");
                     }
 
-                    // Read keys (0-13 possible keys)
-       for (byte keyNr = 0; keyNr <= 13; keyNr++)
-    {
-      listBoxKeys.Items.Add(new KeyItem(keyNr, $"Key {keyNr}"));
-    }
+                    // Read keys (0-13 possible keys) with default 16-byte zero values
+                    string defaultKey = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+                    for (byte keyNr = 0; keyNr <= 13; keyNr++)
+                    {
+                        listBoxKeys.Items.Add(new KeyItem(keyNr, $"Key {keyNr}", defaultKey));
+                    }
 
                     toolStripStatusLabel.Text = $"Application selected: {fileCount} files found - Select a file to read";
                 }
