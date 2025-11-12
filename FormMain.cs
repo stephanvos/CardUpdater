@@ -312,8 +312,8 @@
                     for (int i = 0; i < fileCount; i++)
                     {
                        // istBoxAIDs.Items.Add($"AID {i + 1}: 0x{aid[2]:X2}{aid[1]:X2}{aid[0]:X2}");
-                        listBoxFiles.Items.Add($"FILE {i + 1}: 0x{fileIds[i]:X2}");
-                        listBoxFiles.Items[i] = new FileItem(fileIds[i], $"FILE {i + 1}: 0x{fileIds[i]:X2}");
+                        listBoxFiles.Items.Add($"FILE {i}: 0x{fileIds[i]:X2}");
+                        listBoxFiles.Items[i] = new FileItem(fileIds[i], $"FILE {i}: 0x{fileIds[i]:X2}");
                     }
 
                     // Read keys (0-13 possible keys) with default 16-byte zero values
@@ -425,7 +425,33 @@
 
                 byte fileId = selectedFile.FileId;
 
-                // Update selected file label
+                // Update status to indicate file is selected
+                toolStripStatusLabel.Text = $"File {fileId} selected - Click 'Read File' to read its contents";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error selecting file:\n{ex.Message}",
+                      "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnReadFile_Click(object sender, EventArgs e)
+        {
+            // Check if a file is selected
+            if (listBoxFiles.SelectedIndex < 0 || listBoxFiles.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a file from the Files list first.",
+                    "No File Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                FileItem selectedFile = listBoxFiles.SelectedItem as FileItem;
+                if (selectedFile == null)
+                    return;
+
+                byte fileId = selectedFile.FileId;
 
                 toolStripStatusLabel.Text = $"Reading file {fileId}...";
                 Application.DoEvents();
@@ -438,7 +464,7 @@
                 if (isAuthenticated)
                 {
                     // Use encrypted read method
-                    success = CardComm.ReadDataFile(fileId, 0, 8, ref fileData);
+                    success = CardComm.ReadDataFile(fileId, 0, 0, ref fileData);
 
                     if (success)
                     {
@@ -469,11 +495,11 @@
                     txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\n" +
                         "This file might be encrypted and requires authentication.\r\n\r\n" +
                       "Steps:\r\n" +
-                    "1. Enter the Key Number (0-13)\r\n" +
-                 "2. Enter the 16-byte Key in hex format\r\n" +
+                    "1. Select a key from the Keys list\r\n" +
+                 "2. (Optional) Edit the key value if needed\r\n" +
                   "3. Click 'Authenticate' button\r\n" +
-                      "4. Try reading the file again";
-                    toolStripStatusLabel.Text = "Authentication required to read this file";
+                      "4. Click 'Read File' again";
+            toolStripStatusLabel.Text = "Authentication required to read this file";
                 }
                 else
                 {

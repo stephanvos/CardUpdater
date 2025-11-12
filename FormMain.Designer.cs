@@ -46,6 +46,7 @@
             txtFileData = new TextBox();
             lblFileData = new Label();
             groupBoxAuth = new GroupBox();
+            btnReadFile = new Button();
             btnAuthenticate = new Button();
             statusStrip = new StatusStrip();
             toolStripStatusLabel = new ToolStripStatusLabel();
@@ -243,6 +244,7 @@
             // 
             // groupBoxAuth
             // 
+            groupBoxAuth.Controls.Add(btnReadFile);
             groupBoxAuth.Controls.Add(btnAuthenticate);
             groupBoxAuth.Location = new Point(15, 50);
             groupBoxAuth.Name = "groupBoxAuth";
@@ -250,6 +252,16 @@
             groupBoxAuth.TabIndex = 2;
             groupBoxAuth.TabStop = false;
             groupBoxAuth.Text = "Authentication (required for encrypted files)";
+            // 
+            // btnReadFile
+            // 
+            btnReadFile.Location = new Point(710, 25);
+            btnReadFile.Name = "btnReadFile";
+            btnReadFile.Size = new Size(100, 30);
+            btnReadFile.TabIndex = 5;
+            btnReadFile.Text = "Read File";
+            btnReadFile.UseVisualStyleBackColor = true;
+            btnReadFile.Click += btnReadFile_Click;
             // 
             // btnAuthenticate
             // 
@@ -321,6 +333,7 @@
         private TextBox txtFileData;
         private Label lblFileData;
       private GroupBox groupBoxAuth;
+  private Button btnReadFile;
   private Button btnAuthenticate;
         private StatusStrip statusStrip;
         private ToolStripStatusLabel toolStripStatusLabel;
