@@ -33,9 +33,14 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.btnRefreshReaders = new System.Windows.Forms.Button();
             this.comboBoxReaders = new System.Windows.Forms.ComboBox();
+            this.groupBoxCard = new System.Windows.Forms.GroupBox();
+            this.btnReadAIDs = new System.Windows.Forms.Button();
+            this.listBoxAIDs = new System.Windows.Forms.ListBox();
+            this.lblCardInfo = new System.Windows.Forms.Label();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupBoxReader.SuspendLayout();
+            this.groupBoxCard.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -91,6 +96,47 @@
             this.comboBoxReaders.Size = new System.Drawing.Size(420, 23);
             this.comboBoxReaders.TabIndex = 0;
             // 
+            // groupBoxCard
+            // 
+            this.groupBoxCard.Controls.Add(this.lblCardInfo);
+            this.groupBoxCard.Controls.Add(this.listBoxAIDs);
+            this.groupBoxCard.Controls.Add(this.btnReadAIDs);
+            this.groupBoxCard.Enabled = false;
+            this.groupBoxCard.Location = new System.Drawing.Point(12, 145);
+            this.groupBoxCard.Name = "groupBoxCard";
+            this.groupBoxCard.Size = new System.Drawing.Size(450, 250);
+            this.groupBoxCard.TabIndex = 1;
+            this.groupBoxCard.TabStop = false;
+            this.groupBoxCard.Text = "Card Operations";
+            // 
+            // btnReadAIDs
+            // 
+            this.btnReadAIDs.Location = new System.Drawing.Point(15, 25);
+            this.btnReadAIDs.Name = "btnReadAIDs";
+            this.btnReadAIDs.Size = new System.Drawing.Size(150, 30);
+            this.btnReadAIDs.TabIndex = 0;
+            this.btnReadAIDs.Text = "Read Application IDs";
+            this.btnReadAIDs.UseVisualStyleBackColor = true;
+            this.btnReadAIDs.Click += new System.EventHandler(this.btnReadAIDs_Click);
+            // 
+            // listBoxAIDs
+            // 
+            this.listBoxAIDs.FormattingEnabled = true;
+            this.listBoxAIDs.ItemHeight = 15;
+            this.listBoxAIDs.Location = new System.Drawing.Point(15, 90);
+            this.listBoxAIDs.Name = "listBoxAIDs";
+            this.listBoxAIDs.Size = new System.Drawing.Size(420, 139);
+            this.listBoxAIDs.TabIndex = 1;
+            // 
+            // lblCardInfo
+            // 
+            this.lblCardInfo.AutoSize = true;
+            this.lblCardInfo.Location = new System.Drawing.Point(15, 65);
+            this.lblCardInfo.Name = "lblCardInfo";
+            this.lblCardInfo.Size = new System.Drawing.Size(200, 15);
+            this.lblCardInfo.TabIndex = 2;
+            this.lblCardInfo.Text = "Place card on reader and click Read";
+            // 
             // statusStrip
             // 
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -113,6 +159,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.statusStrip);
+            this.Controls.Add(this.groupBoxCard);
             this.Controls.Add(this.groupBoxReader);
             this.Name = "FormMain";
             this.Text = "Card Updater - Mifare DESFire";
@@ -120,6 +167,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.groupBoxReader.ResumeLayout(false);
             this.groupBoxReader.PerformLayout();
+            this.groupBoxCard.ResumeLayout(false);
+            this.groupBoxCard.PerformLayout();
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -133,6 +182,10 @@
         private System.Windows.Forms.Button btnRefreshReaders;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Label lblReaderStatus;
+        private System.Windows.Forms.GroupBox groupBoxCard;
+        private System.Windows.Forms.Button btnReadAIDs;
+        private System.Windows.Forms.ListBox listBoxAIDs;
+        private System.Windows.Forms.Label lblCardInfo;
         private System.Windows.Forms.StatusStrip statusStrip;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
     }
