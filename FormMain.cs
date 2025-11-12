@@ -235,12 +235,12 @@ namespace CardUpdater
                         listBoxAIDs.Items[i] = new AIDItem(aid, $"AID {i + 1}: 0x{aid[2]:X2}{aid[1]:X2}{aid[0]:X2} ({aidValue})");
                     }
 
-                    lblCardInfo.Text = $"Found {aidCount} application(s) - Click an AID to view files";
+                    lblCardInfo.Text = $"Found {aidCount} application(s)";
                     toolStripStatusLabel.Text = $"Successfully read {aidCount} AIDs";
                 }
                 else if (success && aidCount == 0)
                 {
-                    lblCardInfo.Text = "No applications found on card (blank card)";
+                    lblCardInfo.Text = "No applications found";
                     toolStripStatusLabel.Text = "Card has no applications";
                     MessageBox.Show("No applications found on this card.\n\nThis might be a blank/formatted card.",
                     "No Applications", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -303,12 +303,12 @@ namespace CardUpdater
                         listBoxFiles.Items[i] = new FileItem(fileIds[i], $"File {fileIds[i]:D2} (0x{fileIds[i]:X2})");
                     }
 
-                    lblFileInfo.Text = $"Found {fileCount} file(s) - Authenticate if needed, then click a file";
+                    lblFileInfo.Text = $"Found {fileCount} file(s)";
                     toolStripStatusLabel.Text = $"Application selected: {fileCount} files found";
                 }
                 else if (success && fileCount == 0)
                 {
-                    lblFileInfo.Text = "No files in this application";
+                    lblFileInfo.Text = "No files";
                     toolStripStatusLabel.Text = "Application selected: no files found";
                 }
                 else
@@ -359,9 +359,10 @@ namespace CardUpdater
                     btnAuthenticate.BackColor = Color.LightGreen;
                     btnAuthenticate.Text = "? Auth";
                     toolStripStatusLabel.Text = $"Authenticated with key {keyNumber} (AES)";
-                    lblFileInfo.Text = "Authenticated - Click a file to read encrypted data";
-                    MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
-                "Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    lblFileInfo.Text = "Authenticated";
+                    listBoxFiles_SelectedIndexChanged(sender, e);
+                    //    MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
+                    //"Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
