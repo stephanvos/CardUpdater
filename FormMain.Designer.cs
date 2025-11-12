@@ -34,8 +34,11 @@
             btnRefreshReaders = new Button();
             comboBoxReaders = new ComboBox();
             groupBoxSelection = new GroupBox();
+            txtKeySelection = new TextBox();
+            listBoxKeys = new ListBox();
             listBoxFiles = new ListBox();
             listBoxAIDs = new ListBox();
+            lblKeys = new Label();
             lblFiles = new Label();
             lblAIDs = new Label();
             btnReadAIDs = new Button();
@@ -112,42 +115,64 @@
             // 
             // groupBoxSelection
             // 
+            groupBoxSelection.Controls.Add(txtKeySelection);
+            groupBoxSelection.Controls.Add(listBoxKeys);
             groupBoxSelection.Controls.Add(listBoxFiles);
             groupBoxSelection.Controls.Add(listBoxAIDs);
+            groupBoxSelection.Controls.Add(lblKeys);
             groupBoxSelection.Controls.Add(lblFiles);
             groupBoxSelection.Controls.Add(lblAIDs);
             groupBoxSelection.Controls.Add(btnReadAIDs);
             groupBoxSelection.Enabled = false;
             groupBoxSelection.Location = new Point(12, 86);
             groupBoxSelection.Name = "groupBoxSelection";
-            groupBoxSelection.Size = new Size(960, 179);
+            groupBoxSelection.Size = new Size(960, 200);
             groupBoxSelection.TabIndex = 1;
             groupBoxSelection.TabStop = false;
-            groupBoxSelection.Text = "Selection - Applications & Files";
+            groupBoxSelection.Text = "Selection - Applications, Files & Keys";
+            // 
+            // listBoxKeys
+            // 
+            listBoxKeys.FormattingEnabled = true;
+            listBoxKeys.Location = new Point(305, 52);
+            listBoxKeys.Name = "listBoxKeys";
+            listBoxKeys.Size = new Size(420, 94);
+            listBoxKeys.TabIndex = 6;
+            listBoxKeys.SelectedIndexChanged += listBoxKeys_SelectedIndexChanged;
             // 
             // listBoxFiles
             // 
             listBoxFiles.FormattingEnabled = true;
-            listBoxFiles.Location = new Point(134, 43);
+            listBoxFiles.Location = new Point(159, 52);
             listBoxFiles.Name = "listBoxFiles";
-            listBoxFiles.Size = new Size(122, 124);
+            listBoxFiles.Size = new Size(131, 124);
             listBoxFiles.TabIndex = 4;
             listBoxFiles.SelectedIndexChanged += listBoxFiles_SelectedIndexChanged;
             // 
             // listBoxAIDs
             // 
             listBoxAIDs.FormattingEnabled = true;
-            listBoxAIDs.Location = new Point(15, 44);
+            listBoxAIDs.Location = new Point(15, 52);
             listBoxAIDs.Name = "listBoxAIDs";
-            listBoxAIDs.Size = new Size(98, 94);
+            listBoxAIDs.Size = new Size(126, 79);
             listBoxAIDs.TabIndex = 2;
             listBoxAIDs.SelectedIndexChanged += listBoxAIDs_SelectedIndexChanged;
+            // 
+            // lblKeys
+            // 
+            lblKeys.AutoSize = true;
+            lblKeys.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblKeys.Location = new Point(305, 21);
+            lblKeys.Name = "lblKeys";
+            lblKeys.Size = new Size(33, 15);
+            lblKeys.TabIndex = 5;
+            lblKeys.Text = "Keys";
             // 
             // lblFiles
             // 
             lblFiles.AutoSize = true;
             lblFiles.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            lblFiles.Location = new Point(134, 21);
+            lblFiles.Location = new Point(159, 21);
             lblFiles.Name = "lblFiles";
             lblFiles.Size = new Size(31, 15);
             lblFiles.TabIndex = 3;
@@ -180,9 +205,9 @@
             groupBoxOperations.Controls.Add(lblFileData);
             groupBoxOperations.Controls.Add(groupBoxAuth);
             groupBoxOperations.Enabled = false;
-            groupBoxOperations.Location = new Point(12, 292);
+            groupBoxOperations.Location = new Point(12, 318);
             groupBoxOperations.Name = "groupBoxOperations";
-            groupBoxOperations.Size = new Size(960, 320);
+            groupBoxOperations.Size = new Size(960, 273);
             groupBoxOperations.TabIndex = 2;
             groupBoxOperations.TabStop = false;
             groupBoxOperations.Text = "Read File Data";
@@ -285,6 +310,19 @@
             toolStripStatusLabel.Size = new Size(39, 17);
             toolStripStatusLabel.Text = "Ready";
             // 
+            // txtKeySelection
+            // 
+            txtKeySelection.CharacterCasing = CharacterCasing.Upper;
+            txtKeySelection.Font = new Font("Consolas", 9F);
+            txtKeySelection.Location = new Point(305, 154);
+            txtKeySelection.MaxLength = 47;
+            txtKeySelection.Name = "txtKeySelection";
+            txtKeySelection.PlaceholderText = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+            txtKeySelection.Size = new Size(420, 22);
+            txtKeySelection.TabIndex = 7;
+            txtKeySelection.Text = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+            txtKeySelection.TextChanged += txtKeySelection_TextChanged;
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -318,24 +356,27 @@
         private GroupBox groupBoxReader;
         private Label lblReaderStatus;
         private Button btnConnect;
-     private Button btnRefreshReaders;
-        private ComboBox comboBoxReaders;
-        private GroupBox groupBoxSelection;
-    private ListBox listBoxFiles;
+   private Button btnRefreshReaders;
+      private ComboBox comboBoxReaders;
+      private GroupBox groupBoxSelection;
+     private ListBox listBoxKeys;
+        private ListBox listBoxFiles;
         private ListBox listBoxAIDs;
-  private Label lblFiles;
-      private Label lblAIDs;
-        private Button btnReadAIDs;
+ private Label lblKeys;
+        private Label lblFiles;
+ private Label lblAIDs;
+   private Button btnReadAIDs;
         private GroupBox groupBoxOperations;
         private TextBox txtFileData;
         private Label lblFileData;
-     private GroupBox groupBoxAuth;
-        private Button btnAuthenticate;
-    private TextBox txtKey;
+      private GroupBox groupBoxAuth;
+  private Button btnAuthenticate;
+      private TextBox txtKey;
         private Label lblKey;
         private NumericUpDown numKeyNumber;
         private Label lblKeyNumber;
         private StatusStrip statusStrip;
         private ToolStripStatusLabel toolStripStatusLabel;
+        private TextBox txtKeySelection;
     }
 }

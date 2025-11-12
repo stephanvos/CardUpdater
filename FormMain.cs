@@ -186,7 +186,9 @@
                 groupBoxOperations.Enabled = false;
                 listBoxAIDs.Items.Clear();
                 listBoxFiles.Items.Clear();
+                listBoxKeys.Items.Clear();
                 txtFileData.Clear();
+                txtKeySelection.Clear();
                 btnAuthenticate.BackColor = SystemColors.Control;
                 btnAuthenticate.Text = "Authenticate";
             }
@@ -205,6 +207,7 @@
             {
                 listBoxAIDs.Items.Clear();
                 listBoxFiles.Items.Clear();
+                listBoxKeys.Items.Clear();
                 txtFileData.Clear();
                 selectedAID = null;
 
@@ -301,6 +304,7 @@
                 success = CardCommExtensions.GetFileIDs(ref fileIds, ref fileCount);
 
                 listBoxFiles.Items.Clear();
+                listBoxKeys.Items.Clear();
                 txtFileData.Clear();
 
                 if (success && fileCount > 0)
@@ -311,6 +315,12 @@
                         listBoxFiles.Items.Add($"FILE {i + 1}: 0x{fileIds[i]:X2}");
                         listBoxFiles.Items[i] = new FileItem(fileIds[i], $"FILE {i + 1}: 0x{fileIds[i]:X2}");
                     }
+
+                    // Read keys (0-13 possible keys)
+       for (byte keyNr = 0; keyNr <= 13; keyNr++)
+    {
+      listBoxKeys.Items.Add(new KeyItem(keyNr, $"Key {keyNr}"));
+    }
 
                     toolStripStatusLabel.Text = $"Application selected: {fileCount} files found - Select a file to read";
                 }
@@ -558,6 +568,93 @@
             public override string ToString()
             {
                 return Display;
+            }
+        }
+
+        private class KeyItem
+        {
+            public byte KeyNumber { get; set; }
+            public string KeyValue { get; set; }  // Hex string
+            public string Display { get; set; }
+
+            public KeyItem(byte keyNumber, string display, string keyValue = "")
+            {
+                KeyNumber = keyNumber;
+                Display = display;
+                KeyValue = keyValue;
+            }
+
+            public override string ToString()
+            {
+                if (string.IsNullOrEmpty(KeyValue))
+                    return Display;
+                else
+                    return $"{Display}: {KeyValue}";
+            }
+        }
+
+        private void listBoxKeys_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBoxKeys.SelectedIndex < 0 || listBoxKeys.SelectedItem == null)
+            {
+                txtKeySelection.Clear();
+                return;
+            }
+
+            try
+            {
+                KeyItem selectedKey = listBoxKeys.SelectedItem as KeyItem;
+                if (selectedKey == null)
+                    return;
+
+                // Fill authentication fields with selected key
+                numKeyNumber.Value = selectedKey.KeyNumber;
+                
+                // Show existing key value in txtKeySelection
+                if (!string.IsNullOrEmpty(selectedKey.KeyValue))
+                {
+                    txtKeySelection.Text = selectedKey.KeyValue;
+                    txtKey.Text = selectedKey.KeyValue;
+                }
+                else
+                {
+                    txtKeySelection.Text = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+                }
+
+                toolStripStatusLabel.Text = $"Key {selectedKey.KeyNumber} selected - Enter key value below";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error selecting key:\n{ex.Message}",
+                  "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void txtKeySelection_TextChanged(object sender, EventArgs e)
+        {
+            if (listBoxKeys.SelectedIndex < 0 || listBoxKeys.SelectedItem == null)
+                return;
+
+            try
+            {
+                KeyItem selectedKey = listBoxKeys.SelectedItem as KeyItem;
+                if (selectedKey == null)
+                    return;
+
+                // Update the key value in the KeyItem
+                selectedKey.KeyValue = txtKeySelection.Text;
+    
+                // Also update the authentication textbox
+                txtKey.Text = txtKeySelection.Text;
+
+                // Refresh the listbox display to show updated key
+                int currentIndex = listBoxKeys.SelectedIndex;
+                listBoxKeys.Items[currentIndex] = selectedKey;
+                listBoxKeys.SelectedIndex = currentIndex;
+            }
+            catch
+            {
+                // Silently handle errors during typing
             }
         }
 
