@@ -155,20 +155,20 @@ namespace CardUpdater
 
             // Update UI based on card presence
             this.cardPresent = cardPresent;
-         
+
             if (cardPresent)
             {
                 // Store card UID
                 currentCardUID = new byte[length];
                 Array.Copy(uid, currentCardUID, length);
                 currentCardUIDLength = length;
-         
+
                 // Convert UID to hex string
                 string uidString = BitConverter.ToString(uid, 0, length).Replace("-", " ");
                 toolStripStatusLabel.Text = $"Card detected - UID: {uidString}";
                 lblReaderStatus.Text = "Card present";
                 lblReaderStatus.ForeColor = Color.Blue;
-                
+
                 // Enable card operations
                 groupBoxCard.Enabled = true;
                 lblCardInfo.Text = $"Card UID: {uidString}";
@@ -177,11 +177,11 @@ namespace CardUpdater
             {
                 currentCardUID = null;
                 currentCardUIDLength = 0;
-            
+
                 toolStripStatusLabel.Text = "No card in field";
                 lblReaderStatus.Text = "Connected";
                 lblReaderStatus.ForeColor = Color.Green;
-     
+
                 // Disable card operations
                 groupBoxCard.Enabled = false;
                 lblCardInfo.Text = "Place card on reader and click Read";
@@ -204,7 +204,7 @@ namespace CardUpdater
                 listBoxFiles.Items.Clear();
                 txtFileData.Clear();
                 selectedAID = null;
-    
+
                 lblCardInfo.Text = "Reading Application IDs...";
                 toolStripStatusLabel.Text = "Reading AIDs from card...";
                 Application.DoEvents();
@@ -226,14 +226,14 @@ namespace CardUpdater
                         aid[2] = aids[aidIndex + 2];
 
                         string aidHex = BitConverter.ToString(aid).Replace("-", " ");
-      
+
                         // Also show as integer (little endian)
                         int aidValue = aid[0] | (aid[1] << 8) | (aid[2] << 16);
-    
+
                         listBoxAIDs.Items.Add($"AID {i + 1}: 0x{aid[2]:X2}{aid[1]:X2}{aid[0]:X2} ({aidValue})");
                         // Store AID as tag for later use
                         listBoxAIDs.Items[i] = new AIDItem(aid, $"AID {i + 1}: 0x{aid[2]:X2}{aid[1]:X2}{aid[0]:X2} ({aidValue})");
-                     }
+                    }
 
                     lblCardInfo.Text = $"Found {aidCount} application(s) - Click an AID to view files";
                     toolStripStatusLabel.Text = $"Successfully read {aidCount} AIDs";
@@ -278,7 +278,7 @@ namespace CardUpdater
 
                 // Select the application on the card
                 bool success = CardComm.SelectApplication(selectedAID);
-       
+
                 if (!success)
                 {
                     MessageBox.Show("Failed to select application on card.",
@@ -326,199 +326,199 @@ namespace CardUpdater
 
         private void btnAuthenticate_Click(object sender, EventArgs e)
         {
-          if (selectedAID == null)
-     {
-       MessageBox.Show("Please select an application first.",
-   "No Application Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-         return;
-   }
+            if (selectedAID == null)
+            {
+                MessageBox.Show("Please select an application first.",
+            "No Application Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-     try
-      {
-           // Parse key number
-   byte keyNumber = (byte)numKeyNumber.Value;
+            try
+            {
+                // Parse key number
+                byte keyNumber = (byte)numKeyNumber.Value;
 
- // Parse key from hex string
-         byte[] key = ParseHexKey(txtKey.Text);
-     if (key == null || key.Length != 16)
-         {
-      MessageBox.Show("Invalid key format. Please enter 16 hex bytes (e.g., 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00)",
-            "Invalid Key", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-   return;
-       }
+                // Parse key from hex string
+                byte[] key = ParseHexKey(txtKey.Text);
+                if (key == null || key.Length != 16)
+                {
+                    MessageBox.Show("Invalid key format. Please enter 16 hex bytes (e.g., 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00)",
+                          "Invalid Key", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-      toolStripStatusLabel.Text = "Authenticating...";
-     Application.DoEvents();
+                toolStripStatusLabel.Text = "Authenticating...";
+                Application.DoEvents();
 
                 // Try AES authentication first
-          bool success = CardComm.StartSessionAES(key, keyNumber);
+                bool success = CardComm.StartSessionAES(key, keyNumber);
 
-if (success)
+                if (success)
                 {
-           isAuthenticated = true;
-         btnAuthenticate.BackColor = Color.LightGreen;
-          btnAuthenticate.Text = "? Auth";
-   toolStripStatusLabel.Text = $"Authenticated with key {keyNumber} (AES)";
-  lblFileInfo.Text = "Authenticated - Click a file to read encrypted data";
-                MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
-            "Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-       }
-     else
-         {
-           isAuthenticated = false;
-           btnAuthenticate.BackColor = SystemColors.Control;
-           btnAuthenticate.Text = "Auth";
-      toolStripStatusLabel.Text = "Authentication failed";
+                    isAuthenticated = true;
+                    btnAuthenticate.BackColor = Color.LightGreen;
+                    btnAuthenticate.Text = "? Auth";
+                    toolStripStatusLabel.Text = $"Authenticated with key {keyNumber} (AES)";
+                    lblFileInfo.Text = "Authenticated - Click a file to read encrypted data";
+                    MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
+                "Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    isAuthenticated = false;
+                    btnAuthenticate.BackColor = SystemColors.Control;
+                    btnAuthenticate.Text = "Auth";
+                    toolStripStatusLabel.Text = "Authentication failed";
                     MessageBox.Show("Authentication failed. Please check the key number and key value.\n\nMake sure:\n- The key number exists in the application\n- The key value is correct\n- The card is still present",
          "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-           }
- }
-          catch (Exception ex)
+                }
+            }
+            catch (Exception ex)
             {
-    isAuthenticated = false;
+                isAuthenticated = false;
                 btnAuthenticate.BackColor = SystemColors.Control;
-   btnAuthenticate.Text = "Auth";
+                btnAuthenticate.Text = "Auth";
                 MessageBox.Show($"Error during authentication:\n{ex.Message}",
          "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
- }
+        }
 
         private void listBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-        if (listBoxFiles.SelectedIndex < 0 || listBoxFiles.SelectedItem == null)
-          return;
+            if (listBoxFiles.SelectedIndex < 0 || listBoxFiles.SelectedItem == null)
+                return;
 
             try
-   {
-          FileItem selectedFile = listBoxFiles.SelectedItem as FileItem;
-     if (selectedFile == null)
-   return;
+            {
+                FileItem selectedFile = listBoxFiles.SelectedItem as FileItem;
+                if (selectedFile == null)
+                    return;
 
-           byte fileId = selectedFile.FileId;
+                byte fileId = selectedFile.FileId;
 
                 lblFileInfo.Text = $"Reading file {fileId}...";
-   Application.DoEvents();
+                Application.DoEvents();
 
-       byte[] fileData = new byte[8192];
-     int actualLength = 0;
-        bool success = false;
+                byte[] fileData = new byte[8192];
+                int actualLength = 0;
+                bool success = false;
 
-   // Try authenticated read first if we're authenticated
- if (isAuthenticated)
- {
-       // Use encrypted read method
-      success = CardComm.ReadDataFile(fileId, 0, 0, ref fileData);
-     
-       if (success)
-     {
-             // Find actual length (remove padding)
-             actualLength = fileData.Length;
-for (int i = fileData.Length - 1; i >= 0; i--)
-      {
-     if (fileData[i] != 0)
-               {
-                 actualLength = i + 1;
-   break;
-        }
-  }
-       }
-                }
-      else
+                // Try authenticated read first if we're authenticated
+                if (isAuthenticated)
                 {
- // Try plain read
-              success = CardCommExtensions.ReadPlainDataFile(fileId, 0, 0, ref fileData, ref actualLength);
-          }
+                    // Use encrypted read method
+                    success = CardComm.ReadDataFile(fileId, 0, 8, ref fileData);
 
-     if (success && actualLength > 0)
-          {
-        DisplayFileData(fileId, fileData, actualLength, isAuthenticated);
-           }
-     else if (!success && !isAuthenticated)
-         {
-        txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\n" +
-  "This file might be encrypted and requires authentication.\r\n\r\n" +
-   "Steps:\r\n" +
-           "1. Enter the Key Number (0-13)\r\n" +
-    "2. Enter the 16-byte Key in hex format\r\n" +
-        "3. Click 'Auth' button\r\n" +
-             "4. Try reading the file again";
-    lblFileInfo.Text = $"File {fileId} requires authentication";
- toolStripStatusLabel.Text = "Authentication required to read this file";
-         }
-         else
-           {
-       txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\nThe file might be empty or there was an error.";
-             lblFileInfo.Text = $"Failed to read file {fileId}";
-        toolStripStatusLabel.Text = "Error reading file";
-           }
+                    if (success)
+                    {
+                        // Find actual length (remove padding)
+                        actualLength = fileData.Length;
+                        for (int i = fileData.Length - 1; i >= 0; i--)
+                        {
+                            if (fileData[i] != 0)
+                            {
+                                actualLength = i + 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // Try plain read
+                    success = CardCommExtensions.ReadPlainDataFile(fileId, 0, 0, ref fileData, ref actualLength);
+                }
+
+                if (success && actualLength > 0)
+                {
+                    DisplayFileData(fileId, fileData, actualLength, isAuthenticated);
+                }
+                else if (!success && !isAuthenticated)
+                {
+                    txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\n" +
+              "This file might be encrypted and requires authentication.\r\n\r\n" +
+               "Steps:\r\n" +
+                       "1. Enter the Key Number (0-13)\r\n" +
+                "2. Enter the 16-byte Key in hex format\r\n" +
+                    "3. Click 'Auth' button\r\n" +
+                         "4. Try reading the file again";
+                    lblFileInfo.Text = $"File {fileId} requires authentication";
+                    toolStripStatusLabel.Text = "Authentication required to read this file";
+                }
+                else
+                {
+                    txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\nThe file might be empty or there was an error.";
+                    lblFileInfo.Text = $"Failed to read file {fileId}";
+                    toolStripStatusLabel.Text = "Error reading file";
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error reading file:\n{ex.Message}",
            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-  }
+            }
         }
 
- private void DisplayFileData(byte fileId, byte[] fileData, int actualLength, bool wasEncrypted)
+        private void DisplayFileData(byte fileId, byte[] fileData, int actualLength, bool wasEncrypted)
         {
- // Display as hex and try to decode as text
+            // Display as hex and try to decode as text
             string hexString = BitConverter.ToString(fileData, 0, actualLength).Replace("-", " ");
-        string textString = System.Text.Encoding.UTF8.GetString(fileData, 0, actualLength);
+            string textString = System.Text.Encoding.UTF8.GetString(fileData, 0, actualLength);
 
             // Check if it's printable text
-      bool isPrintable = true;
-    for (int i = 0; i < actualLength; i++)
+            bool isPrintable = true;
+            for (int i = 0; i < actualLength; i++)
             {
-         if (fileData[i] < 32 && fileData[i] != 10 && fileData[i] != 13 && fileData[i] != 9)
-        {
-    isPrintable = false;
-             break;
-     }
-  }
+                if (fileData[i] < 32 && fileData[i] != 10 && fileData[i] != 13 && fileData[i] != 9)
+                {
+                    isPrintable = false;
+                    break;
+                }
+            }
 
-    txtFileData.Clear();
-          txtFileData.AppendText($"File {fileId} - Length: {actualLength} bytes");
-    if (wasEncrypted)
+            txtFileData.Clear();
+            txtFileData.AppendText($"File {fileId} - Length: {actualLength} bytes");
+            if (wasEncrypted)
             {
-       txtFileData.AppendText(" [ENCRYPTED - Decrypted with AES]");
-   }
+                txtFileData.AppendText(" [ENCRYPTED - Decrypted with AES]");
+            }
             txtFileData.AppendText($"\r\n{'=',60}\r\n\r\n");
             txtFileData.AppendText($"HEX:\r\n{hexString}\r\n\r\n");
 
- if (isPrintable)
-    {
-        txtFileData.AppendText($"TEXT:\r\n{textString}\r\n");
+            if (isPrintable)
+            {
+                txtFileData.AppendText($"TEXT:\r\n{textString}\r\n");
             }
             else
             {
                 txtFileData.AppendText($"TEXT: (binary data, not printable)\r\n");
             }
 
-    lblFileInfo.Text = $"File {fileId}: {actualLength} bytes read" + (wasEncrypted ? " (encrypted)" : " (plain)");
+            lblFileInfo.Text = $"File {fileId}: {actualLength} bytes read" + (wasEncrypted ? " (encrypted)" : " (plain)");
             toolStripStatusLabel.Text = $"Successfully read file {fileId}" + (wasEncrypted ? " with decryption" : "");
         }
 
         private byte[] ParseHexKey(string hexString)
         {
             try
-      {
-// Remove spaces and validate
-          string cleaned = hexString.Replace(" ", "").Replace("-", "").Trim();
-           
-    if (cleaned.Length != 32) // 16 bytes = 32 hex chars
-        return null;
+            {
+                // Remove spaces and validate
+                string cleaned = hexString.Replace(" ", "").Replace("-", "").Trim();
 
-      byte[] key = new byte[16];
-     for (int i = 0; i < 16; i++)
-       {
-                key[i] = Convert.ToByte(cleaned.Substring(i * 2, 2), 16);
+                if (cleaned.Length != 32) // 16 bytes = 32 hex chars
+                    return null;
+
+                byte[] key = new byte[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    key[i] = Convert.ToByte(cleaned.Substring(i * 2, 2), 16);
+                }
+                return key;
             }
-    return key;
- }
             catch
-         {
-   return null;
-       }
+            {
+                return null;
+            }
         }
 
         // Helper classes to store AID and File info
