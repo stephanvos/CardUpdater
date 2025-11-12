@@ -360,7 +360,7 @@ namespace CardUpdater
                     btnAuthenticate.Text = "? Auth";
                     toolStripStatusLabel.Text = $"Authenticated with key {keyNumber} (AES)";
                     lblFileInfo.Text = "Authenticated";
-                    listBoxFiles_SelectedIndexChanged(sender, e);
+                   // listBoxFiles_SelectedIndexChanged(sender, e);
                     //    MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
                     //"Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
