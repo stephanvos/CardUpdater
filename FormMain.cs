@@ -170,8 +170,7 @@ namespace CardUpdater
                 lblReaderStatus.ForeColor = Color.Blue;
 
                 // Enable card operations
-                groupBoxCard.Enabled = true;
-                lblCardInfo.Text = $"Card UID: {uidString}";
+                groupBoxSelection.Enabled = true;
             }
             else
             {
@@ -183,9 +182,15 @@ namespace CardUpdater
                 lblReaderStatus.ForeColor = Color.Green;
 
                 // Disable card operations
-                groupBoxCard.Enabled = false;
-                lblCardInfo.Text = "Place card on reader and click Read";
+                groupBoxSelection.Enabled = false;
+                groupBoxOperations.Enabled = false;
                 listBoxAIDs.Items.Clear();
+                listBoxFiles.Items.Clear();
+                txtFileData.Clear();
+                lblSelectedAID.Text = "Selected Application: -";
+                lblSelectedFile.Text = "Selected File: -";
+                btnAuthenticate.BackColor = SystemColors.Control;
+                btnAuthenticate.Text = "Authenticate";
             }
         }
 
@@ -205,7 +210,6 @@ namespace CardUpdater
                 txtFileData.Clear();
                 selectedAID = null;
 
-                lblCardInfo.Text = "Reading Application IDs...";
                 toolStripStatusLabel.Text = "Reading AIDs from card...";
                 Application.DoEvents();
 
@@ -235,19 +239,16 @@ namespace CardUpdater
                         listBoxAIDs.Items[i] = new AIDItem(aid, $"AID {i + 1}: 0x{aid[2]:X2}{aid[1]:X2}{aid[0]:X2} ({aidValue})");
                     }
 
-                    lblCardInfo.Text = $"Found {aidCount} application(s)";
-                    toolStripStatusLabel.Text = $"Successfully read {aidCount} AIDs";
+                    toolStripStatusLabel.Text = $"Successfully read {aidCount} AIDs - Select one to view files";
                 }
                 else if (success && aidCount == 0)
                 {
-                    lblCardInfo.Text = "No applications found";
                     toolStripStatusLabel.Text = "Card has no applications";
                     MessageBox.Show("No applications found on this card.\n\nThis might be a blank/formatted card.",
                     "No Applications", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    lblCardInfo.Text = "Failed to read AIDs";
                     toolStripStatusLabel.Text = "Error reading AIDs";
                     MessageBox.Show("Failed to read Application IDs from card.\n\nMake sure the card is properly positioned on the reader.",
                     "Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -255,10 +256,9 @@ namespace CardUpdater
             }
             catch (Exception ex)
             {
-                lblCardInfo.Text = "Error occurred";
                 toolStripStatusLabel.Text = "Error reading card";
                 MessageBox.Show($"Error while reading Application IDs:\n{ex.Message}",
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -267,59 +267,68 @@ namespace CardUpdater
             if (listBoxAIDs.SelectedIndex < 0 || listBoxAIDs.SelectedItem == null)
                 return;
 
-            try
-            {
-                AIDItem selectedItem = listBoxAIDs.SelectedItem as AIDItem;
-                if (selectedItem == null)
-                    return;
+     try
+     {
+            AIDItem selectedItem = listBoxAIDs.SelectedItem as AIDItem;
+              if (selectedItem == null)
+           return;
 
-                selectedAID = selectedItem.AID;
+       selectedAID = selectedItem.AID;
                 isAuthenticated = false;  // Reset auth when switching apps
 
-                // Select the application on the card
-                bool success = CardComm.SelectApplication(selectedAID);
+ // Reset authenticate button appearance
+          btnAuthenticate.BackColor = SystemColors.Control;
+           btnAuthenticate.Text = "Authenticate";
 
-                if (!success)
-                {
-                    MessageBox.Show("Failed to select application on card.",
-                        "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+       // Update selected AID label
+   int aidValue = selectedAID[0] | (selectedAID[1] << 8) | (selectedAID[2] << 16);
+      lblSelectedAID.Text = $"Selected Application: 0x{selectedAID[2]:X2}{selectedAID[1]:X2}{selectedAID[0]:X2} ({aidValue})";
+
+   // Enable operations group (for authentication)
+                groupBoxOperations.Enabled = true;
+
+     // Select the application on the card
+     bool success = CardComm.SelectApplication(selectedAID);
+
+          if (!success)
+    {
+         MessageBox.Show("Failed to select application on card.",
+         "Selection Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+     return;
+      }
 
                 // Read file IDs from selected application
-                byte[] fileIds = new byte[32];
-                int fileCount = 0;
+    byte[] fileIds = new byte[32];
+      int fileCount = 0;
 
-                success = CardCommExtensions.GetFileIDs(ref fileIds, ref fileCount);
+      success = CardCommExtensions.GetFileIDs(ref fileIds, ref fileCount);
 
-                listBoxFiles.Items.Clear();
-                txtFileData.Clear();
+     listBoxFiles.Items.Clear();
+             txtFileData.Clear();
+           lblSelectedFile.Text = "Selected File: -";
 
-                if (success && fileCount > 0)
+    if (success && fileCount > 0)
                 {
-                    for (int i = 0; i < fileCount; i++)
-                    {
-                        listBoxFiles.Items.Add($"File {fileIds[i]:D2} (0x{fileIds[i]:X2})");
-                        listBoxFiles.Items[i] = new FileItem(fileIds[i], $"File {fileIds[i]:D2} (0x{fileIds[i]:X2})");
-                    }
+   for (int i = 0; i < fileCount; i++)
+          {
+      listBoxFiles.Items.Add($"File {fileIds[i]:D2} (0x{fileIds[i]:X2})");
+          listBoxFiles.Items[i] = new FileItem(fileIds[i], $"File {fileIds[i]:D2} (0x{fileIds[i]:X2})");
+        }
 
-                    lblFileInfo.Text = $"Found {fileCount} file(s)";
-                    toolStripStatusLabel.Text = $"Application selected: {fileCount} files found";
-                }
+         toolStripStatusLabel.Text = $"Application selected: {fileCount} files found - Select a file to read";
+       }
                 else if (success && fileCount == 0)
                 {
-                    lblFileInfo.Text = "No files";
-                    toolStripStatusLabel.Text = "Application selected: no files found";
-                }
-                else
-                {
-                    lblFileInfo.Text = "Failed to read files";
-                    toolStripStatusLabel.Text = "Error reading file list";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error selecting application:\n{ex.Message}",
+    toolStripStatusLabel.Text = "Application selected: no files found";
+       }
+        else
+          {
+   toolStripStatusLabel.Text = "Error reading file list";
+         }
+       }
+         catch (Exception ex)
+     {
+    MessageBox.Show($"Error selecting application:\n{ex.Message}",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -359,16 +368,12 @@ namespace CardUpdater
                     btnAuthenticate.BackColor = Color.LightGreen;
                     btnAuthenticate.Text = "? Auth";
                     toolStripStatusLabel.Text = $"Authenticated with key {keyNumber} (AES)";
-                    lblFileInfo.Text = "Authenticated";
-                   // listBoxFiles_SelectedIndexChanged(sender, e);
-                    //    MessageBox.Show($"Successfully authenticated with AES key {keyNumber}",
-                    //"Authentication Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
                     isAuthenticated = false;
                     btnAuthenticate.BackColor = SystemColors.Control;
-                    btnAuthenticate.Text = "Auth";
+                    btnAuthenticate.Text = "Authenticate";
                     toolStripStatusLabel.Text = "Authentication failed";
                     MessageBox.Show("Authentication failed. Please check the key number and key value.\n\nMake sure:\n- The key number exists in the application\n- The key value is correct\n- The card is still present",
          "Authentication Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -378,7 +383,7 @@ namespace CardUpdater
             {
                 isAuthenticated = false;
                 btnAuthenticate.BackColor = SystemColors.Control;
-                btnAuthenticate.Text = "Auth";
+                btnAuthenticate.Text = "Authenticate";
                 MessageBox.Show($"Error during authentication:\n{ex.Message}",
          "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -387,77 +392,82 @@ namespace CardUpdater
         private void listBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBoxFiles.SelectedIndex < 0 || listBoxFiles.SelectedItem == null)
-                return;
+       {
+    // Clear file selection but keep operations enabled
+    lblSelectedFile.Text = "Selected File: -";
+        return;
+            }
 
-            try
-            {
-                FileItem selectedFile = listBoxFiles.SelectedItem as FileItem;
-                if (selectedFile == null)
-                    return;
+      try
+       {
+   FileItem selectedFile = listBoxFiles.SelectedItem as FileItem;
+ if (selectedFile == null)
+          return;
 
-                byte fileId = selectedFile.FileId;
+          byte fileId = selectedFile.FileId;
+     
+      // Update selected file label
+    lblSelectedFile.Text = $"Selected File: {fileId:D2} (0x{fileId:X2})";
 
-                lblFileInfo.Text = $"Reading file {fileId}...";
-                Application.DoEvents();
+         toolStripStatusLabel.Text = $"Reading file {fileId}...";
+    Application.DoEvents();
 
-                byte[] fileData = new byte[8192];
-                int actualLength = 0;
-                bool success = false;
+          byte[] fileData = new byte[8192];
+     int actualLength = 0;
+    bool success = false;
 
-                // Try authenticated read first if we're authenticated
-                if (isAuthenticated)
-                {
-                    // Use encrypted read method
-                    success = CardComm.ReadDataFile(fileId, 0, 8, ref fileData);
+   // Try authenticated read first if we're authenticated
+          if (isAuthenticated)
+    {
+  // Use encrypted read method
+         success = CardComm.ReadDataFile(fileId, 0, 8, ref fileData);
 
-                    if (success)
-                    {
-                        // Find actual length (remove padding)
-                        actualLength = fileData.Length;
-                        for (int i = fileData.Length - 1; i >= 0; i--)
-                        {
-                            if (fileData[i] != 0)
-                            {
-                                actualLength = i + 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Try plain read
-                    success = CardCommExtensions.ReadPlainDataFile(fileId, 0, 0, ref fileData, ref actualLength);
-                }
+ if (success)
+{
+            // Find actual length (remove padding)
+     actualLength = fileData.Length;
+    for (int i = fileData.Length - 1; i >= 0; i--)
+    {
+     if (fileData[i] != 0)
+       {
+             actualLength = i + 1;
+  break;
+       }
+        }
+        }
+ }
+        else
+         {
+          // Try plain read
+         success = CardCommExtensions.ReadPlainDataFile(fileId, 0, 0, ref fileData, ref actualLength);
+    }
 
-                if (success && actualLength > 0)
-                {
-                    DisplayFileData(fileId, fileData, actualLength, isAuthenticated);
-                }
-                else if (!success && !isAuthenticated)
-                {
-                    txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\n" +
+     if (success && actualLength > 0)
+   {
+     DisplayFileData(fileId, fileData, actualLength, isAuthenticated);
+     }
+          else if (!success && !isAuthenticated)
+        {
+          txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\n" +
               "This file might be encrypted and requires authentication.\r\n\r\n" +
-               "Steps:\r\n" +
-                       "1. Enter the Key Number (0-13)\r\n" +
-                "2. Enter the 16-byte Key in hex format\r\n" +
-                    "3. Click 'Auth' button\r\n" +
-                         "4. Try reading the file again";
-                    lblFileInfo.Text = $"File {fileId} requires authentication";
-                    toolStripStatusLabel.Text = "Authentication required to read this file";
-                }
-                else
-                {
-                    txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\nThe file might be empty or there was an error.";
-                    lblFileInfo.Text = $"Failed to read file {fileId}";
-                    toolStripStatusLabel.Text = "Error reading file";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error reading file:\n{ex.Message}",
-           "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            "Steps:\r\n" +
+          "1. Enter the Key Number (0-13)\r\n" +
+       "2. Enter the 16-byte Key in hex format\r\n" +
+        "3. Click 'Authenticate' button\r\n" +
+            "4. Try reading the file again";
+     toolStripStatusLabel.Text = "Authentication required to read this file";
+        }
+      else
+      {
+  txtFileData.Text = $"Failed to read file {fileId}.\r\n\r\nThe file might be empty or there was an error.";
+        toolStripStatusLabel.Text = "Error reading file";
+       }
+       }
+  catch (Exception ex)
+      {
+   MessageBox.Show($"Error reading file:\n{ex.Message}",
+         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+     }
         }
 
         private void DisplayFileData(byte fileId, byte[] fileData, int actualLength, bool wasEncrypted)
@@ -495,8 +505,7 @@ namespace CardUpdater
                 txtFileData.AppendText($"TEXT: (binary data, not printable)\r\n");
             }
 
-            lblFileInfo.Text = $"File {fileId}: {actualLength} bytes read" + (wasEncrypted ? " (encrypted)" : " (plain)");
-            toolStripStatusLabel.Text = $"Successfully read file {fileId}" + (wasEncrypted ? " with decryption" : "");
+            toolStripStatusLabel.Text = $"File {fileId}: {actualLength} bytes read" + (wasEncrypted ? " (encrypted)" : " (plain)");
         }
 
         private byte[] ParseHexKey(string hexString)
